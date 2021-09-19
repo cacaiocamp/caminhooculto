@@ -11,3 +11,5 @@ For that, the sculpture uses 8 LDRs (light dependent resistors) and plastic piec
 
 The code developed, besides being responsible for the sounds, has a huge role in the gamming aspect of the project, recycling from time to time the possible patterns and their related processes, forcing a constant interaction with the sculpture in a search for new visual patterns and the sound manipulation.
 ![caminhooculto_GUI](caminhoocultoGUI_caioCampos.jpg)
+
+This project is deticated to my grandfather, that loves playing Caminho Oculto, was the one who showed me this game and laughed at me many times before I could solve it.
