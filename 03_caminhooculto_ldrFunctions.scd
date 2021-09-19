@@ -125,7 +125,7 @@
 			//check if process is different
 			if(~lastIdetifiedLDRPatternIndex != patternFoundIndex, {
 				~funcSetLastIdentifiedLDRPattern.value(patternFoundIndex, ~vecLDRPatterns[patternFoundIndex].processToTriggerName);
-				"chamou".postln;
+				~lastIdetifiedLDRPatternIndex = patternFoundIndex;
 			});
 			//trigger process
 		});

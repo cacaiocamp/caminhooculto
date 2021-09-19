@@ -95,7 +95,7 @@
 		});
 
 		~vecLDRPatterns[ldrPatternChoosen.index].currentRelatedLDRPatternDisplayIndex = possibleLDRPatternIndex;
-		~vecLDRPatterns[ldrPatternChoosen.index].processToTriggerName = "abcdefghijklmnopq".scramble;
+		~vecLDRPatterns[ldrPatternChoosen.index].processToTriggerName = ["panDirect", "wavetbInterpol", "panAvarage", "killSynth", "addSynth", "iterations", "changeEnv", "killAll", "changePatterns", "shortAttacks"].choose;
 		//add process index
 
 		{
