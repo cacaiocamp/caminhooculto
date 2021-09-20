@@ -7,11 +7,11 @@ caminhooculto is a sculpture inspired by a old game with the same name ([Caminho
 
 The sculpture was planned to retain most of the game's characteristics but change the game's objective, which becomes generating visual patterns with the quadrilateral pieces that activate process of audio synthesis and processing, with a code developed in [SuperCollider](https://supercollider.github.io/).
 
-For that, the sculpture uses 8 LDRs (light dependent resistors) and plastic pieces of different colors and transparency levels, cut also in quadrilateral formats. The plastic pieces allow the control of the luminosity valeus measured by the LDRs. Those values are then used to identify the visual patterns formed with the quadrilateral plastic pieces as well as to control the sound processes programmed.
+For that, the sculpture uses 8 LDRs (light dependent resistors) and plastic pieces of different colors and transparency levels, cut also in quadrilateral formats. The plastic pieces allow the control of the luminosity values measured by the LDRs. Those values are then used to identify the visual patterns formed with the quadrilateral plastic pieces as well as to control the sound processes programmed.
 
 ![caminhooculto_sculpture](gitimgs/caminhoocultoFoto_caioCampos.jpg)
 
-The code developed, besides being responsible for the sounds, has a huge role in the gamming aspect of the project, recycling from time to time the possible patterns and their related processes, forcing a constant interaction with the sculpture in a search for new visual patterns and the sound manipulation.
+The code developed, besides being responsible for the sounds, has a huge role in the gaming aspect of the project, recycling from time to time the possible patterns and their related processes, forcing a constant interaction with the sculpture in a search for new visual patterns and the sound manipulation.
 
 ![caminhooculto_GUI](gitimgs/caminhoocultoGUI_caioCampos.jpg)
 
