@@ -1,6 +1,8 @@
 (
 {
 	~funcInstantiateLDRs = {
+		var radiansPosition = [pi/4, 0, -pi/4, pi/2, -pi/2, pi*3/4, pi, -pi*3/4];
+
 		8.do({
 			arg index;
 			var newLDR;
@@ -8,10 +10,12 @@
 			newLDR = ~ldrEventClassStructure.value(
 				pinNumber: index,
 				valueObjGUI: ~vecPinValuesStaticText[index],
+				valueAvarageObjGUI: ~vecPinValuesAvaragesStaticText[index],
 				controlAvarageObjGUI: ~vecPinControlAvaragesStaticText[index],
 				topAvarageObjGUI: ~vecPinTopAvaragesStaticText[index],
 				bottomAvarageObjGUI: ~vecPinBottomAvaragesStaticText[index],
-				controlTriggerObjGUI: ~vecControlSquares[index]
+				controlTriggerObjGUI: ~vecControlSquares[index],
+				positionRadians: radiansPosition[index]
 			);
 
 			~vecLDRs = ~vecLDRs.add(newLDR);
@@ -22,7 +26,7 @@
 
 	~funcAddUpdateLDRsTask = {
 
-		~updateLDRsTask = Task.new({
+		~updateLDRsTask = Routine.new({
 			inf.do({
 				var byteReceived, fullMessage, ldrMessage;
 				if(~arduinoSerialPort.read==10, {
@@ -46,11 +50,10 @@
 						(~portName+"read message:"+fullMessage).postln;
 					});
 				});
-				(1.0/9600).wait;
 			});
-		}, SystemClock);
+		});
 
-		~updateLDRsTask.start;
+		~updateLDRsTask.play;
 	};
 
 	// LDR Message structure
@@ -65,70 +68,6 @@
 		});
 
 		~vecLDRs[analogPinNumber.asString.asInteger].updateCurValue(valueMessage.asInteger);
-	};
-
-	~funcStartLDRGuiUpdateTasks = {
-		~updateGUILDRValuesTask = Task.new({
-			inf.do({
-				~vecLDRs[0].guiValueObj.string = ~vecLDRs[0].curValue.asString;
-				~vecLDRs[1].guiValueObj.string = ~vecLDRs[1].curValue.asString;
-				~vecLDRs[2].guiValueObj.string = ~vecLDRs[2].curValue.asString;
-				~vecLDRs[3].guiValueObj.string = ~vecLDRs[3].curValue.asString;
-				~vecLDRs[4].guiValueObj.string = ~vecLDRs[4].curValue.asString;
-				~vecLDRs[5].guiValueObj.string = ~vecLDRs[5].curValue.asString;
-				~vecLDRs[6].guiValueObj.string = ~vecLDRs[6].curValue.asString;
-				~vecLDRs[7].guiValueObj.string = ~vecLDRs[7].curValue.asString;
-
-				(1.0/60).wait;
-			});
-		}, AppClock);
-
-		~updateGUILDRValuesTask.play();
-	};
-
-	~funcCheckPatternToTrigger = {
-		var triggeredLDRs = [], patternFoundIndex = -1;
-
-		for(0, 7, {
-			arg i;
-
-			if(~vecLDRs[i].controlValueTriggered == -1, {
-				triggeredLDRs = triggeredLDRs.add(1);
-			}, {
-				triggeredLDRs = triggeredLDRs.add(0);
-			});
-		});
-
-		~vecCurrentPossibleLDRPatternIndexes.do({
-			arg ldrPatternIndex;
-			var differenceFound = false;
-
-			~ldrPatternsDisplays[ldrPatternIndex].do({
-				arg triggerValue, valueIndex;
-				var trigOnOff = 0;
-
-				if(triggerValue >= 1, {
-					trigOnOff = 1;
-				});
-
-				if(trigOnOff != triggeredLDRs[valueIndex], {
-					differenceFound = true;
-				});
-			});
-
-			if(differenceFound == false, {
-				patternFoundIndex = ldrPatternIndex;
-			});
-		});
-
-		if(patternFoundIndex != -1, {
-			//check if process is different
-			if(~lastIdetifiedLDRPatternIndex != patternFoundIndex, {
-				~funcSetLastIdentifiedLDRPattern.value(patternFoundIndex, ~vecLDRPatterns[patternFoundIndex].processToTriggerName);
-				~lastIdetifiedLDRPatternIndex = patternFoundIndex;
-			});
-			//trigger process
-		});
 	};
 }.fork(SystemClock);
 )

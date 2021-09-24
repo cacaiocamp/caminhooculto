@@ -15,6 +15,7 @@
 
 // --- Other configs
 ~record = false;
+~running = false;
 
 // --- DEFAULT GUI values
 ~avaibleBounds = Window.screenBounds;  //- Rect containing the maximum width and height for the Views
@@ -51,7 +52,8 @@
 ];
 
 // --- Other DEFAULT values
-~controlValueTrigInterval = 1000; //in msec
+~controlValueTrigInterval = 1500; //in msec
+~ldrValueAvarageSize = 24;
 
 // --- Initialisations
 ~vecLDRs = [];
@@ -62,6 +64,7 @@
 ~vecLastIndentifiedLDRPatternObjs = [];
 ~vecPossibleLDRPatternsObjs = [];
 ~vecPinValuesStaticText = [];
+~vecPinValuesAvaragesStaticText = [];
 ~vecPinControlAvaragesStaticText = [];
 ~vecPinTopAvaragesStaticText = [];
 ~vecPinBottomAvaragesStaticText = [];
@@ -87,9 +90,9 @@ s.boot;
 			s.newAllocators;
 			s.sync;
 
+			"--> searching for device at por".postln();
 			SerialPort.devices.do({
 				arg device;
-				device.asString.postln();
 				if(device.asString == ~portName.asString, {
 					~portFound = true;
 				});
@@ -101,9 +104,7 @@ s.boot;
 				~arduinoSerialPort = SerialPort.new(~portName, 9600, crtscts: true);
 				s.sync;
 
-				"----------".postln();
 				// define encoder / decoder matrices
-				//~decoder.free
 				~encoder = FoaEncoderMatrix.newDirection;
 				~decoder = FoaDecoderKernel.newCIPIC; // kernel decoders should be freed after use!!
 				s.sync;
@@ -120,6 +121,8 @@ s.boot;
 				this.executeFile(Document.current.dir +/+ "03_caminhooculto_ldrFunctions.scd");
 				this.executeFile(Document.current.dir +/+ "04_caminhooculto_ldrPatternFunctions.scd");
 				this.executeFile(Document.current.dir +/+ "05_caminhooculto_GUIFunctions.scd");
+				this.executeFile(Document.current.dir +/+ "06_caminhooculto_synthDefs.scd");
+				this.executeFile(Document.current.dir +/+ "07_caminhooculto_processes.scd");
 				s.sync;
 
 				//instantiate sensor objects
@@ -134,20 +137,19 @@ s.boot;
 
 				//groups
 				~group_master = Group.new();
-				//~group_test = Group.new(~group_master, \addToHead);
-				//~group_decoders = Group.new(~group_master, \addToTail); //precisa ser último grupo
+				~group_nodes = Group.new(~group_master, \addToHead);
+				~group_decoders = Group.new(~group_master, \addToTail); //needs to be the last group
 				/*
 				~group_soundIn = Group.new(~group_master, \addToHead);
 				~group_liveRoute = Group.new(~group_master, \addToTail);
 				~group_sustainProcs = Group.new(~group_master, \addToTail);
 				~group_grainProcs = Group.new(~group_master, \addToTail);
 				~group_reverb = Group.new(~group_master, \addToTail);
-				grupos nodes
 				*/
 				s.sync;
 
-				//~busA_speakersOut = Bus.new('audio',~speakerBuses[0], 2);
-				//~busA_BF_toDecode = Bus.audio(s, 4);
+				~busA_speakersOut = Bus.new('audio',~speakerBuses[0], 2);
+				~busA_BF_toDecode = Bus.audio(s, 4);
 				/*
 				~busA_saxIn = Bus.audio(s, 1);
 
@@ -161,16 +163,17 @@ s.boot;
 
 				"\n|--------> caminhooculto started <--------|".postln;
 
-				/*(~outSetup == \binaural).if({
-				~speakerDecoder = Synth(\binauralDecoder,
-				[
-				\inbusBF, ~busA_BF_toDecode,
-				\outbus, ~busA_speakersOut,
-				\amp, 1
-				], ~group_decoders
-				);
-				"--> decoder binaural/out added".postln;
-				});*/
+				//ambisonics node initialization
+				(~outSetup == \binaural).if({
+					~speakerDecoder = Synth(\binauralDecoder,
+						[
+							\inbusBF, ~busA_BF_toDecode,
+							\outbus, ~busA_speakersOut,
+							\amp, 1
+						], ~group_decoders
+					);
+					"|--> decoder binaural/out added".postln;
+				});
 			}, {
 				("\n|--------> caminhooculto FAILED : SerialPort " ++ ~portName.asString ++ " not found <--------|").postln;
 			});

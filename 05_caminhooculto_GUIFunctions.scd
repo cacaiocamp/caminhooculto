@@ -1,5 +1,33 @@
 (
 {
+	~funcStartLDRGuiUpdateTasks = {
+		~updateGUILDRValuesTask = Task.new({
+			inf.do({
+				~vecLDRs[0].guiValueObj.string = ~vecLDRs[0].curValue.asString;
+				~vecLDRs[1].guiValueObj.string = ~vecLDRs[1].curValue.asString;
+				~vecLDRs[2].guiValueObj.string = ~vecLDRs[2].curValue.asString;
+				~vecLDRs[3].guiValueObj.string = ~vecLDRs[3].curValue.asString;
+				~vecLDRs[4].guiValueObj.string = ~vecLDRs[4].curValue.asString;
+				~vecLDRs[5].guiValueObj.string = ~vecLDRs[5].curValue.asString;
+				~vecLDRs[6].guiValueObj.string = ~vecLDRs[6].curValue.asString;
+				~vecLDRs[7].guiValueObj.string = ~vecLDRs[7].curValue.asString;
+
+				~vecLDRs[0].guiValueAvarageObj.string = ~vecLDRs[0].curValueAvarage.asString;
+				~vecLDRs[1].guiValueAvarageObj.string = ~vecLDRs[1].curValueAvarage.asString;
+				~vecLDRs[2].guiValueAvarageObj.string = ~vecLDRs[2].curValueAvarage.asString;
+				~vecLDRs[3].guiValueAvarageObj.string = ~vecLDRs[3].curValueAvarage.asString;
+				~vecLDRs[4].guiValueAvarageObj.string = ~vecLDRs[4].curValueAvarage.asString;
+				~vecLDRs[5].guiValueAvarageObj.string = ~vecLDRs[5].curValueAvarage.asString;
+				~vecLDRs[6].guiValueAvarageObj.string = ~vecLDRs[6].curValueAvarage.asString;
+				~vecLDRs[7].guiValueAvarageObj.string = ~vecLDRs[7].curValueAvarage.asString;
+
+				(1.0/60).wait;
+			});
+		}, AppClock);
+
+		~updateGUILDRValuesTask.play();
+	};
+
 	~funcStartAvaraging = {
 		~vecLDRs.size.do({
 			arg index;
@@ -95,7 +123,8 @@
 		});
 
 		~vecLDRPatterns[ldrPatternChoosen.index].currentRelatedLDRPatternDisplayIndex = possibleLDRPatternIndex;
-		~vecLDRPatterns[ldrPatternChoosen.index].processToTriggerName = ["panDirect", "wavetbInterpol", "panAvarage", "killSynth", "addSynth", "iterations", "changeEnv", "killAll", "changePatterns", "shortAttacks"].choose;
+		~vecLDRPatterns[ldrPatternChoosen.index].processToTriggerIndex = ~processesArray.size.rand;
+		~vecLDRPatterns[ldrPatternChoosen.index].processToTriggerName = ~processNames[~vecLDRPatterns[ldrPatternChoosen.index].processToTriggerIndex];
 		//add process index
 
 		{
@@ -138,6 +167,7 @@
 
 		~taskUpdatePossibleLDRPatterns.play;
 		~taskUpdatePossiblePatternsDuration.play;
+		~running = true;
 	};
 }.fork(AppClock);
 )

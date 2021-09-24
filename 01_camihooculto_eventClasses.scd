@@ -4,9 +4,10 @@
 {
 	// --- LDR Class
 	~ldrEventClassStructure = {
-		arg pinNumber, valueObjGUI, controlAvarageObjGUI, topAvarageObjGUI, bottomAvarageObjGUI, controlTriggerObjGUI;
+		arg pinNumber, valueObjGUI, valueAvarageObjGUI, controlAvarageObjGUI, topAvarageObjGUI, bottomAvarageObjGUI, controlTriggerObjGUI, positionRadians;
 		var pinNum = pinNumber,
 		    guiObj = valueObjGUI,
+		    guiAvarageObj = valueAvarageObjGUI,
 	    	guiControlObj = controlAvarageObjGUI,
 	    	guiTopValueObj = topAvarageObjGUI,
 	    	guiBottomObj = bottomAvarageObjGUI,
@@ -14,12 +15,20 @@
 	    ;
 		(
 			pin: pinNum,
-			curValue: 0,
 			guiValueObj: guiObj,
+			guiValueAvarageObj: guiAvarageObj,
 			guiControlAvarageObj: guiControlObj,
 			guiTopAvarageObj: guiTopValueObj,
 			guiBottomAvarageObj: guiBottomObj,
 			controlValueTriggerObj: guiControlTriggerObj,
+
+			curValue: 0,
+			curValueAvarage: 0,
+			curValueAvarageArray: [],
+			valueBus: Bus.control(s, 1),
+			valueAvarageBus: Bus.control(s, 1),
+			positionAzi: positionRadians,
+			newSynth: nil,
 
 			calculatingAvarage: false,
 			valuesToAvarage: [],
@@ -34,6 +43,23 @@
 				arg self, newValue;
 
 				self.curValue = newValue;
+
+				if(self.curValueAvarageArray.size <= ~ldrValueAvarageSize, {
+					self.curValueAvarageArray = self.curValueAvarageArray.add(self.curValue);
+				}, {
+					self.curValueAvarageArray.removeAt(0);
+					self.curValueAvarageArray = self.curValueAvarageArray.add(self.curValue);
+				});
+				self.curValueAvarage = (self.curValueAvarageArray.sum / self.curValueAvarageArray.size).asInteger;
+
+				if((self.topAvarage != nil) && (self.bottomAvarage != nil), {
+					self.valueBus.set(self.curValue.linlin(self.bottomAvarage, self.topAvarage, 0, 1));
+					self.valueAvarageBus.set(self.curValueAvarage.linlin(self.bottomAvarage, self.topAvarage, 0, 1));
+				}, {
+					self.valueBus.set(self.curValue);
+					self.valueAvarageBus.set(self.curValueAvarage);
+				});
+
 
 				if(self.calculatingAvarage == true, {
 					self.valuesToAvarage = self.valuesToAvarage.add(self.curValue);
@@ -94,6 +120,20 @@
 							self.trigControlSquare(self.controlValueTriggered+1);
 
 							~funcCheckPatternToTrigger.value();
+
+							if(self.controlValueTriggered == -1, {
+								if((~running == true) && (~shortAttacksOn == true),{
+									self.newSynth = Synth(\sinRhoTest, [
+										\azi, self.positionAzi,
+										\rhoBusControl, self.valueBus,
+										\freq, rrand(100, 2000),
+										\freqImpulse, rrand(6, 16),
+										\outbus, ~busA_BF_toDecode
+									], ~group_nodes);
+								});
+							},{
+								self.newSynth.free;
+							});
 
 							taskToReturn.stop;
 						});

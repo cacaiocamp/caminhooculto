@@ -40,6 +40,15 @@ AppClock.sched(0,{
 	        a5Value_staticText,
 	        a6Value_staticText,
 	        a7Value_staticText,
+	    //----- Pin values avarages
+	        a0ValueAvarage_staticText,
+	        a1ValueAvarage_staticText,
+	        a2ValueAvarage_staticText,
+	        a3ValueAvarage_staticText,
+	        a4ValueAvarage_staticText,
+	        a5ValueAvarage_staticText,
+	        a6ValueAvarage_staticText,
+	        a7ValueAvarage_staticText,
 	    //----- Control Pin values
 	        a0ControlValue_staticText,
 	        a1ControlValue_staticText,
@@ -171,6 +180,8 @@ AppClock.sched(0,{
 		~decoder.free;
 		~speakerDecoder.free;
 		"|--> decoder and decoderSynth freed".postln;
+
+		s.freeAll;
 		"\n|--------> caminhooculto stopped <--------|".postln;
 	};
 
@@ -539,7 +550,6 @@ AppClock.sched(0,{
 	.stringColor_(Color.new(51/255, 51/255, 1, 0.7))
 	.string_("A7");
 
-
 	//--------------- Pin Values
 	a0Value_staticText = StaticText.new(~compsBg, Rect(vecLDRDrawPositions[0].x - (~textSizeGeneral*0.9), vecLDRDrawPositions[0].y + (1.25 * ~textSizeGeneral) , ~textSizeGeneral * 2.5, ~textSizeGeneral * 2))
 	.font_(Font("Courier New", ~textSizeGeneral - 1, true))
@@ -596,6 +606,63 @@ AppClock.sched(0,{
 	.stringColor_(Color.new(0.75,0.85,0.85,0.7))
 	.string_("0000");
 	~vecPinValuesStaticText = ~vecPinValuesStaticText.add(a7Value_staticText);
+
+	//--------------- Pin Values
+	a0ValueAvarage_staticText = StaticText.new(~compsBg, Rect(vecLDRDrawPositions[0].x - (~textSizeGeneral*0.9), vecLDRDrawPositions[0].y + (2.25 * ~textSizeGeneral) , ~textSizeGeneral * 2.5, ~textSizeGeneral * 2))
+	.font_(Font("Courier New", ~textSizeGeneral - 3, true))
+	.align_(\right)
+	.stringColor_(Color.new(0.75,0.85,0.85,0.7))
+	.string_("0000");
+	~vecPinValuesAvaragesStaticText = ~vecPinValuesAvaragesStaticText.add(a0ValueAvarage_staticText);
+
+	a1ValueAvarage_staticText = StaticText.new(~compsBg, Rect(vecLDRDrawPositions[1].x - (~textSizeGeneral*0.9), vecLDRDrawPositions[1].y + (2.25 * ~textSizeGeneral) , ~textSizeGeneral * 2.5, ~textSizeGeneral * 2))
+	.font_(Font("Courier New", ~textSizeGeneral - 3, true))
+	.align_(\right)
+	.stringColor_(Color.new(0.75,0.85,0.85,0.7))
+	.string_("0000");
+	~vecPinValuesAvaragesStaticText = ~vecPinValuesAvaragesStaticText.add(a1ValueAvarage_staticText);
+
+	a2ValueAvarage_staticText = StaticText.new(~compsBg, Rect(vecLDRDrawPositions[2].x - (~textSizeGeneral*0.9), vecLDRDrawPositions[2].y + (2.25 * ~textSizeGeneral) , ~textSizeGeneral * 2.5, ~textSizeGeneral * 2))
+	.font_(Font("Courier New", ~textSizeGeneral - 3, true))
+	.align_(\right)
+	.stringColor_(Color.new(0.75,0.85,0.85,0.7))
+	.string_("0000");
+	~vecPinValuesAvaragesStaticText = ~vecPinValuesAvaragesStaticText.add(a2ValueAvarage_staticText);
+
+	a3ValueAvarage_staticText = StaticText.new(~compsBg, Rect(vecLDRDrawPositions[3].x - (~textSizeGeneral*0.9), vecLDRDrawPositions[3].y + (2.25 * ~textSizeGeneral) , ~textSizeGeneral * 2.5, ~textSizeGeneral * 2))
+	.font_(Font("Courier New", ~textSizeGeneral - 3, true))
+	.align_(\right)
+	.stringColor_(Color.new(0.75,0.85,0.85,0.7))
+	.string_("0000");
+	~vecPinValuesAvaragesStaticText = ~vecPinValuesAvaragesStaticText.add(a3ValueAvarage_staticText);
+
+	a4ValueAvarage_staticText = StaticText.new(~compsBg, Rect(vecLDRDrawPositions[4].x - (~textSizeGeneral*0.9), vecLDRDrawPositions[4].y + (2.25 * ~textSizeGeneral) , ~textSizeGeneral * 2.5, ~textSizeGeneral * 2))
+	.font_(Font("Courier New", ~textSizeGeneral - 3, true))
+	.align_(\right)
+	.stringColor_(Color.new(0.75,0.85,0.85,0.7))
+	.string_("0000");
+	~vecPinValuesAvaragesStaticText = ~vecPinValuesAvaragesStaticText.add(a4ValueAvarage_staticText);
+
+	a5ValueAvarage_staticText = StaticText.new(~compsBg, Rect(vecLDRDrawPositions[5].x - (~textSizeGeneral*0.9), vecLDRDrawPositions[5].y + (2.25 * ~textSizeGeneral) , ~textSizeGeneral * 2.5, ~textSizeGeneral * 2))
+	.font_(Font("Courier New", ~textSizeGeneral - 3, true))
+	.align_(\right)
+	.stringColor_(Color.new(0.75,0.85,0.85,0.7))
+	.string_("0000");
+	~vecPinValuesAvaragesStaticText = ~vecPinValuesAvaragesStaticText.add(a5ValueAvarage_staticText);
+
+	a6ValueAvarage_staticText = StaticText.new(~compsBg, Rect(vecLDRDrawPositions[6].x - (~textSizeGeneral*0.9), vecLDRDrawPositions[6].y + (2.25 * ~textSizeGeneral) , ~textSizeGeneral * 2.5, ~textSizeGeneral * 2))
+	.font_(Font("Courier New", ~textSizeGeneral - 3, true))
+	.align_(\right)
+	.stringColor_(Color.new(0.75,0.85,0.85,0.7))
+	.string_("0000");
+	~vecPinValuesAvaragesStaticText = ~vecPinValuesAvaragesStaticText.add(a6ValueAvarage_staticText);
+
+	a7ValueAvarage_staticText = StaticText.new(~compsBg, Rect(vecLDRDrawPositions[7].x - (~textSizeGeneral*0.9), vecLDRDrawPositions[7].y + (2.25 * ~textSizeGeneral) , ~textSizeGeneral * 2.5, ~textSizeGeneral * 2))
+	.font_(Font("Courier New", ~textSizeGeneral - 3, true))
+	.align_(\right)
+	.stringColor_(Color.new(0.75,0.85,0.85,0.7))
+	.string_("0000");
+	~vecPinValuesAvaragesStaticText = ~vecPinValuesAvaragesStaticText.add(a7ValueAvarage_staticText);
 
 	//---------------Pin Control Values
 	a0ControlValue_staticText = StaticText.new(~compsBg, Rect(vecLDRDrawPositions[0].x - (3 * ~textSizeGeneral), vecLDRDrawPositions[0].y - (0.35 * ~textSizeGeneral), ~textSizeGeneral * 2.5, ~textSizeGeneral * 2))
