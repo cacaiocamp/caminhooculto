@@ -58,6 +58,7 @@
 // --- Initialisations
 ~vecLDRs = [];
 ~vecLDRPatterns = [];
+~vecNodeSpawners = [];
 ~vecControlSquares = [];
 ~vecCurrentPossibleLDRPatternIndexes = [];
 ~lastIdetifiedLDRPatternIndex = -1;

@@ -152,6 +152,12 @@ AppClock.sched(0,{
 		~taskUpdatePossibleLDRPatterns.stop;
 		~taskUpdatePossiblePatternsDuration.stop;
 
+		~vecNodeSpawners.do({
+			arg nodeSpawner;
+
+			nodeSpawner.taskNodeSpawner.stop;
+		});
+
 		/*~vecJoycons.do({
 			arg joycon;
 			joycon.searchCommandsTask.stop;

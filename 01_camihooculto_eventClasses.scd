@@ -165,5 +165,67 @@
 		)
 	};
 
+	~nodeSpawnerEventClassStructure = {
+		(
+			curNode: nil,
+			busesRelatedArray: nil,
+			buffersRelatedArray: nil,
+			outbus: nil,
+
+			taskNodeSpawner: nil,
+
+			aziPos: nil,
+			aziRange: nil,
+
+
+			setNodeSpawner: {
+				arg self, buffersRelated = [], busesRelated = [], outbus = ~busA_BF_toDecode, aziPos = rrand(0, 2.0), aziRange = 0.1;
+
+				self.buffersRelatedArray = buffersRelated;
+				self.busesRelatedArray = busesRelated;
+				self.outbus = outbus;
+
+				self.taskNodeSpawner = Task.new({
+					inf.do({
+						var envSize, minEnvDur, maxEnvDur, envelope, aziEnvelope, freqStart, freqEnd, detune, waitBetweenNodes = rrand(0, 2.0);
+
+						envSize = rrand(3, 25);
+						minEnvDur = rrand(3, 5.0);
+						maxEnvDur = minEnvDur + rrand(5.0, 8);
+						envelope = Env.new(
+							[0] ++ ({1.0.rand}.dup(envSize-2)).scramble ++ [0],
+							({rrand(minEnvDur/envSize, maxEnvDur/envSize)}.dup(envSize)).scramble
+						);
+						aziEnvelope = Env.new(
+							({rrand(aziPos - aziRange, aziPos + aziRange)}.dup(envSize)).scramble,
+							({rrand(minEnvDur/envSize, maxEnvDur/envSize)}.dup(envSize)).scramble
+						);
+						freqStart = rrand(0, 9.0) + 6.midicps;
+						freqEnd = freqStart + rrand(0, 2.0);
+
+						self.curNodes = 3.collect({
+							Synth(\wavetableSynthesis, [
+								\bufnumStart, self.buffersRelatedArray[0],
+								\bufnumEnd, self.buffersRelatedArray[self.buffersRelatedArray.size() - 1],
+								\freqStart, freqStart.midicps,
+								\freqEnd, freqEnd.midicps,
+								\detune, rrand(0.1, 0.4),
+								\amp, 0.1 + rrand(0, 0.2),
+								\env, envelope,
+								\aziEnv, aziEnvelope,
+								\outbus, outbus
+							], ~group_nodes);
+						});
+
+						(envelope.totalDuration).wait;
+						waitBetweenNodes.wait;
+					});
+				}, SystemClock);
+
+				self.taskNodeSpawner.play;
+			}
+		)
+	};
+
 }.fork(SystemClock);
 )
