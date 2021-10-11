@@ -14,7 +14,7 @@
 //~inOutDevice, "AudioBox ASIO Driver";
 
 // --- Other configs
-~record = false;
+~record = true;
 ~running = false;
 
 // --- DEFAULT GUI values
@@ -45,15 +45,33 @@
 	[0, 1, 0, 1, 1, 0, 1, 0], //a1, a3, a4, a6
 	[1, 0, 1, 0, 0, 1, 0, 1], //a0, a2, a5, a7
 	[0, 2, 2, 0, 0, 2, 2, 0], //a1, a2, a5, a6
+	[2, 2, 0, 0, 0, 0, 2, 2], //a0, a1, a6, a7
 	[3, 0, 0, 3, 3, 0, 0, 3], //a0, a3, a4, a7
+	[0, 0, 3, 3, 3, 3, 0, 0], //a2, a3, a4, a5
 	[3, 0, 0, 3, 0, 2, 2, 0], //a1, a2, a5, a6
 	[0, 2, 2, 0, 3, 0, 0, 3], //a1, a2, a4, a7
+	[3, 2, 2, 3, 0, 0, 0, 0], //a0, a1, a2, a3
+	[0, 0, 0, 0, 3, 2, 2, 3], //a4, a5, a6, a7
+	[0, 1, 1, 1, 1, 0, 1, 0], //a1, a2, a3, a4, a6
+	[0, 1, 0, 1, 1, 1, 1, 0], //a1, a3, a4, a5, a6
+	[0, 1, 0, 1, 1, 0, 1, 1], //a1, a3, a4, a6, a7
+	[1, 1, 0, 1, 1, 0, 1, 0], //a0, a1, a3, a4, a6
+	[3, 1, 3, 3, 3, 0, 0, 0], //a0, a1, a2, a3, a4
+	[2, 2, 0, 1, 0, 2, 2, 0], //a0, a1, a3, a5, a6
+	[0, 0, 0, 3, 3, 3, 1, 3], //a3, a4, a5, a6, a7
+	[0, 2, 2, 0, 1, 0, 2, 2], //a1, a2, a4, a6, a7
+	[0, 1, 1, 1, 1, 1, 1, 0], //a1, a2, a3, a4, a5, a6
+	[1, 1, 0, 1, 1, 0, 1, 1], //a0, a1, a3, a4, a6, a7
 	[1, 1, 1, 1, 1, 1, 1, 1]
 ];
 
 // --- Other DEFAULT values
-~controlValueTrigInterval = 1500; //in msec
-~ldrValueAvarageSize = 24;
+~controlValueTrigInterval = 750; //in msec
+~ldrValueAvarageSize = 24; //how many ldrValues to group for avaraging
+~minNodesPerNodeSpawner = 2;
+~maxNodesPerNodeSpawner = 4;
+~minimumWaitForNewPatterns = 15.0;
+~maximumWaitForNewPatterns = 45.0;
 
 // --- Initialisations
 ~vecLDRs = [];
@@ -61,7 +79,7 @@
 ~vecNodeSpawners = [];
 ~vecControlSquares = [];
 ~vecCurrentPossibleLDRPatternIndexes = [];
-~lastIdetifiedLDRPatternIndex = -1;
+~lastIdentifiedLDRPatternIndex = -1;
 ~vecLastIndentifiedLDRPatternObjs = [];
 ~vecPossibleLDRPatternsObjs = [];
 ~vecPinValuesStaticText = [];
@@ -73,6 +91,12 @@
 ~updateGUILDRValuesTask = nil;
 ~possiblePatternsDuration = 0; //in sec
 ~possiblePatternsDurationToDisplay = 0; //in sec
+~shortAttacksOn = false;
+~currentEnvelopeType = ~envTypes[\crescendo];
+
+// --- Dictionaries
+~envTypes = Dictionary.newFrom(List[\anyType, -1, \random, 0, \sine, 1, \twoPeaks, 2, \shortPeaks, 3, \crescendo, 4]);
+~processesIndexes = Dictionary.newFrom(List[\changePatterns, 0, \addSynth, 1, \killSynth, 2, \panDirect, 3, \wavetbInterpol, 4, \changeEnv, 5, \changeAllEnvs, 6, \killAll, 7]);
 
 // --- Server config
 s = Server.local;
@@ -91,16 +115,26 @@ s.boot;
 			s.newAllocators;
 			s.sync;
 
-			"--> searching for device at por".postln();
+			("--> searching for device at port" + ~portName).postln();
 			SerialPort.devices.do({
 				arg device;
 				if(device.asString == ~portName.asString, {
 					~portFound = true;
+					"|--> device found".postln();
 				});
 			});
 			s.sync;
 
 			if(~portFound == true, {
+				if(~record == true, {
+					{
+						s.recHeaderFormat = "wav";
+						s.sync;
+						s.record;
+						(0.02).wait;
+					}.fork();
+				});
+
 				//serialPort
 				~arduinoSerialPort = SerialPort.new(~portName, 9600, crtscts: true);
 				s.sync;
@@ -108,12 +142,6 @@ s.boot;
 				// define encoder / decoder matrices
 				~encoder = FoaEncoderMatrix.newDirection;
 				~decoder = FoaDecoderKernel.newCIPIC; // kernel decoders should be freed after use!!
-				s.sync;
-
-				//buses de controle e buffers
-				s.sync;
-
-				//outras variaveis globais
 				s.sync;
 
 				//documentos
@@ -140,26 +168,10 @@ s.boot;
 				~group_master = Group.new();
 				~group_nodes = Group.new(~group_master, \addToHead);
 				~group_decoders = Group.new(~group_master, \addToTail); //needs to be the last group
-				/*
-				~group_soundIn = Group.new(~group_master, \addToHead);
-				~group_liveRoute = Group.new(~group_master, \addToTail);
-				~group_sustainProcs = Group.new(~group_master, \addToTail);
-				~group_grainProcs = Group.new(~group_master, \addToTail);
-				~group_reverb = Group.new(~group_master, \addToTail);
-				*/
 				s.sync;
 
 				~busA_speakersOut = Bus.new('audio',~speakerBuses[0], 2);
 				~busA_BF_toDecode = Bus.audio(s, 4);
-				/*
-				~busA_saxIn = Bus.audio(s, 1);
-
-				~busA_BF_liveRoute = Bus.audio(s, 4);
-				~busA_BF_sustainProcs = Bus.audio(s, 4);
-				~busA_BF_grainProcs = Bus.audio(s, 4);
-				~busA_BF_reverb =  Bus.audio(s, 4);
-				buses de audio
-				*/
 				s.sync;
 
 				"\n|--------> caminhooculto started <--------|".postln;

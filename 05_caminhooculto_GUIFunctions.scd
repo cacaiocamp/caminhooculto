@@ -93,7 +93,7 @@
 	~funcSetLastIdentifiedLDRPattern = {
 		arg ldrPatternDisplayIndexToSet, processTriggeredName;
 
-		~lastIdetifiedLDRPatternIndex = ldrPatternDisplayIndexToSet;
+		~lastIdentifiedLDRPatternIndex = ldrPatternDisplayIndexToSet;
 
 		{
 			~vecLastIndentifiedLDRPatternObjs[0].string_(processTriggeredName);
@@ -111,21 +111,21 @@
 
 		ldrPatternChoosen = ~vecLDRPatterns.choose();
 
-		while({ldrPatternChoosen.currentRelatedLDRPatternDisplayIndex != -1}, {
+		//checks if the pattern is already selected for the current possible ones or the lastIdentified
+		while({(ldrPatternChoosen.currentRelatedLDRPatternDisplayIndex != -1) || (ldrPatternChoosen.index == ~lastIdentifiedLDRPatternIndex)}, {
 			ldrPatternChoosen = ~vecLDRPatterns.choose();
 		});
 
-		if(possibleLDRPatternIndex > (~vecCurrentPossibleLDRPatternIndexes.size() - 1), {
+		if(possibleLDRPatternIndex > (~vecCurrentPossibleLDRPatternIndexes.size() - 1), { //this only happens on the first time patterns are generated
 			~vecCurrentPossibleLDRPatternIndexes = ~vecCurrentPossibleLDRPatternIndexes.add(ldrPatternChoosen.index);
-		}, {
+		}, { //other times
 			~vecLDRPatterns[~vecCurrentPossibleLDRPatternIndexes[possibleLDRPatternIndex]].currentRelatedLDRPatternDisplayIndex = -1;
 			~vecCurrentPossibleLDRPatternIndexes[possibleLDRPatternIndex] = ldrPatternChoosen.index;
 		});
 
 		~vecLDRPatterns[ldrPatternChoosen.index].currentRelatedLDRPatternDisplayIndex = possibleLDRPatternIndex;
-		~vecLDRPatterns[ldrPatternChoosen.index].processToTriggerIndex = ~processesArray.size.rand;
+		~vecLDRPatterns[ldrPatternChoosen.index].processToTriggerIndex = rrand(0, ~processesArray.size - 1);
 		~vecLDRPatterns[ldrPatternChoosen.index].processToTriggerName = ~processNames[~vecLDRPatterns[ldrPatternChoosen.index].processToTriggerIndex];
-		//add process index
 
 		{
 			~vecPossibleLDRPatternsObjs[possibleLDRPatternIndex][0].string = ~vecLDRPatterns[ldrPatternChoosen.index].processToTriggerName;
@@ -143,12 +143,24 @@
 	~funcStartCaminhooculto = {
 		~taskUpdatePossibleLDRPatterns = Task.new({
 			inf.do({
+				var hasAddSynth = false;
 				6.do({
 					arg index;
 					~funcChangePossibleLDRPattern.value(index);
+
+					if(~vecLDRPatterns[~vecCurrentPossibleLDRPatternIndexes[index]].processToTriggerIndex == ~processesIndexes[\addSynth], {
+						hasAddSynth = true;
+					});
 				});
 
-				~possiblePatternsDuration = ((40.0.rand) + 10.0);
+				if((hasAddSynth == false) && ((~vecNodeSpawners.size == 0) || (rrand(0, 1.0) < 0.1)), {
+					var indexToAddSynth = [0, 1, 2, 3, 4, 5].choose;
+
+					~vecLDRPatterns[~vecCurrentPossibleLDRPatternIndexes[indexToAddSynth]].processToTriggerIndex = ~processesIndexes[\addSynth];
+					~vecLDRPatterns[~vecCurrentPossibleLDRPatternIndexes[indexToAddSynth]].processToTriggerName = ~processNames[~processesIndexes[\addSynth]];
+				});
+
+				~possiblePatternsDuration = rrand(~minimumWaitForNewPatterns, ~maximumWaitForNewPatterns);
 				~possiblePatternsDurationToDisplay = ~possiblePatternsDuration;
 				~possiblePatternsDuration.wait;
 			});

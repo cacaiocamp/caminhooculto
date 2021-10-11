@@ -152,35 +152,12 @@ AppClock.sched(0,{
 		~taskUpdatePossibleLDRPatterns.stop;
 		~taskUpdatePossiblePatternsDuration.stop;
 
+
 		~vecNodeSpawners.do({
 			arg nodeSpawner;
 
 			nodeSpawner.taskNodeSpawner.stop;
 		});
-
-		/*~vecJoycons.do({
-			arg joycon;
-			joycon.searchCommandsTask.stop;
-			joycon.searchCommandsTask.free;
-
-			joycon.vecOscFuncs.do({
-				arg oscFunc;
-				oscFunc.free;
-			});
-
-			joycon.vecSynths.do({
-				arg synth;
-				synth.free;
-			});
-
-			~joyconInputsWithBuses.do({
-				arg inputWithBusName;
-				var inputBusSymbol = (inputWithBusName ++ "_bus").asSymbol;
-
-				joycon[inputBusSymbol].free;
-			});
-
-		});*/
 
 		"--> freeing decoder...".postln;
 		~decoder.free;
@@ -189,6 +166,11 @@ AppClock.sched(0,{
 
 		s.freeAll;
 		"\n|--------> caminhooculto stopped <--------|".postln;
+
+		if(~record == true, {
+			"--> saving file...".postln;
+			s.stopRecording;
+		});
 	};
 
 	~compsBgWidth = ~guiCaminhoOcultoWinWidth - (2*margin);

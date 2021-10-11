@@ -50,12 +50,18 @@
 		});
 
 		if(patternFoundIndex != -1, {
-			if(~lastIdetifiedLDRPatternIndex != patternFoundIndex, {
+			if(~lastIdentifiedLDRPatternIndex != patternFoundIndex, {
 				~funcSetLastIdentifiedLDRPattern.value(patternFoundIndex, ~vecLDRPatterns[patternFoundIndex].processToTriggerName);
-				~lastIdetifiedLDRPatternIndex = patternFoundIndex;
-			});
+				~lastIdentifiedLDRPatternIndex = patternFoundIndex;
 
-			~processesArray[~vecLDRPatterns[patternFoundIndex].processToTriggerIndex].value();
+				if((~vecNodeSpawners.size > 0) || ((~vecLDRPatterns[patternFoundIndex].processToTriggerIndex == ~processesIndexes[\changePatterns]) || (~vecLDRPatterns[patternFoundIndex].processToTriggerIndex == ~processesIndexes[\addSynth])), {
+					~processesArray[~vecLDRPatterns[patternFoundIndex].processToTriggerIndex].value(triggeredLDRs);
+				}, {
+					if(~postValues == true, {
+						"|--> no nodes found. process aborted".postln;
+					});
+				});
+			});
 		});
 	};
 }.fork(SystemClock);
