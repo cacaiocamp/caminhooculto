@@ -1,5 +1,5 @@
 # caminhooculto
-Development started during [SomaRumorII](http://www.artes.uff.br/somarumor/II/en/) sound art residence. It's still in develompent.
+Development started during [SomaRumorII](http://www.artes.uff.br/somarumor/II/en/) sound art residence. It's in a somewhat constant development. A first demo performance can be seen at [this link](https://youtu.be/3htcyPGbrbQ?t=320), along side with other SomaRumorII resident works.
 
 caminhooculto is a sculpture inspired by a old game with the same name ([Caminho Oculto](https://duckduckgo.com/?q=caminho+oculto+jogo&t=brave&iax=images&iai=https%3A%2F%2Fimg.elo7.com.br%2Fproduct%2Fmain%2F294FA7A%2Fcaminho-oculto-em-madeira-memoria.jpg&ia=images)). In this game your objective is to free the biggest piece of the game only by moving the quadrilateral pieces of different formats (the image bellow shows the starting position of the game's pieces and the hole which the biggest piece must be moved through). 
 
