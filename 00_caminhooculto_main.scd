@@ -17,6 +17,10 @@
 ~record = true;
 ~running = false;
 
+// --- Dictionaries
+~envTypes = Dictionary.newFrom(List[\anyType, -1, \random, 0, \sine, 1, \twoPeaks, 2, \shortPeaks, 3, \crescendo, 4]);
+~processesIndexes = Dictionary.newFrom(List[\changePatterns, 0, \addSynth, 1, \killSynth, 2, \panDirect, 3, \wavetbInterpol, 4, \changeEnv, 5, \changeAllEnvs, 6, \killAll, 7]);
+
 // --- DEFAULT GUI values
 ~avaibleBounds = Window.screenBounds;  //- Rect containing the maximum width and height for the Views
 ~defaultGUIMargin = 3;
@@ -93,10 +97,6 @@
 ~possiblePatternsDurationToDisplay = 0; //in sec
 ~shortAttacksOn = false;
 ~currentEnvelopeType = ~envTypes[\crescendo];
-
-// --- Dictionaries
-~envTypes = Dictionary.newFrom(List[\anyType, -1, \random, 0, \sine, 1, \twoPeaks, 2, \shortPeaks, 3, \crescendo, 4]);
-~processesIndexes = Dictionary.newFrom(List[\changePatterns, 0, \addSynth, 1, \killSynth, 2, \panDirect, 3, \wavetbInterpol, 4, \changeEnv, 5, \changeAllEnvs, 6, \killAll, 7]);
 
 // --- Server config
 s = Server.local;
